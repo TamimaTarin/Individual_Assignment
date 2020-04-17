@@ -8,53 +8,80 @@ class HomeController extends Controller
 {
 	public function index(){
 
-		//$data = ['id'=>'11-11-1', 'name'=>'amin', 'dept'=>'CSE'];
-		//return view('home.index', $data);
-
-		/*return view('home.index')
-				->with('id', '12-333-4')
-				->with('name', 'alamin')
-				->with('dept', 'SE');*/
-
-/*		return view('home.index')
-				->withId('12-333-4')
-				->withName('alamin')
-				->withDept('SE');*/
-
-		/*$v = view('home.index');
-		$v->withId('222-222');
-		$v->withName('amin');
-		$v->withDept('CIS');
-		return $v;*/
+		
 
 		return view('home.index');
 	}    
 
 	public function list(){
 
-		$students = $this->getStudentList();
-		return view('home.view_users', ['stds'=> $students]);
+		$buses = $this->getbusList();
+		return view('home.view_buses', ['buses'=> $buses]);
 	}
+	public function insert(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|max:30|min:8',
+            'operator' => 'required|max:30|min:3',
+            'seat_row' => 'required',
+            'seat_column' => 'required',
+            'route' => 'required',
+            'fare' => 'required',
+            'departure' => 'required',
+			'arrival'=>'required',
+        ]);
 
-	public function edit($id, Request $req){
-	
-		$students = $this->getStudentList();
-		$std="";
-		for($i=0; $i< count($students); $i++){
-			if($students[$i]['id'] == $id){
-				$std = $students[$i];
-				break;
-			}
+        $data=array();
+        $data['name']=$request->name;
+        $data['operator']=$request->operator;
+        $data['seat_row']=$request->seat_row;
+        $data['seat_column']=$request->seat_column;
+        $data['route']=$request->route;
+        $data['fare']=$request->fare;
+        $data['departure']=$request->departure;
+        $data['arrival']=$request->arrival;
+        $buses=DB::table('buses')->insert($data);
+		if($data->save()){
+			return redirect()->route('home.list');
+		}else{
+			return redirect()->route('home.add');
 		}
-		return view('home.edit', $std);
-	}
 
-	function getStudentList (){
-		return [
-				['id'=>'12','name'=>'abc','cgpa'=>2.4,'dept'=>'CS'],
-				['id'=>'13','name'=>'XYZ','cgpa'=>2.8,'dept'=>'CSSE'],
-				['id'=>'14','name'=>'PQR','cgpa'=>2.9,'dept'=>'CSE'],
-				['id'=>'125','name'=>'aaa','cgpa'=>2.6,'dept'=>'CIS']
-		];
-	}
+    }
+
+	public function edit(Request $request,$id)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|max:30|min:8',
+            'operator' => 'required|max:30|min:3',
+            'seat_row' => 'required',
+            'seat_column' => 'required',
+            'route' => 'required',
+            'fare' => 'required',
+            'departure' => 'required',
+			'arrival'=>'required',
+        ]);
+
+        $data=array();
+        $data['name']=$request->name;
+        $data['operator']=$request->operator;
+        $data['seat_row']=$request->seat_row;
+        $data['seat_column']=$request->seat_column;
+        $data['route']=$request->route;
+        $data['fare']=$request->fare;
+        $data['departure']=$request->departure;
+        $data['arrival']=$request->arrival;
+        $buses=DB::table('buses')->where('id',$id)->update($data);
+		if($data->save()){
+			return redirect()->route('home.list');
+		}else{
+			return redirect()->route('home.edit');
+		}
+    }
+	public function delete($id)
+    {
+        $buses=DB::table('buses')->where('id',$id)->delete();
+       return redirect()->route('home.list');
+        
+    }
 }
